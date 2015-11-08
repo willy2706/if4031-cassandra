@@ -5,6 +5,7 @@ import com.datastax.driver.core.Session;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import if4031.client.model.*;
+import if4031.client.util.TableName;
 
 import java.lang.reflect.Field;
 
@@ -13,7 +14,6 @@ public class CassandraAccessor implements Accessor {
 
     private final Session session;
     private final Cluster cluster;
-    private final String USERS_TABLE = "users";
 
     private final String keyspace;
     public CassandraAccessor(String brokerAddress, String zookeeperAddress) {
@@ -55,7 +55,18 @@ public class CassandraAccessor implements Accessor {
 //    }
 
     public void registerUser(User user) {
-        //TODO
+        Insert statement = QueryBuilder.insertInto(getKeyspace(), TableName.USERS);
+        for (Field field : user.getClass().getDeclaredFields()) {
+            if (field.getName() != "tableName") {
+                field.setAccessible(true); // if you want to modify private fields
+                try {
+                    statement.value(field.getName(), field.get(user));
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        getSession().execute(statement);
     }
 
     public void followUser(FollowUser followUser) {
