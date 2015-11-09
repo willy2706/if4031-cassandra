@@ -3,9 +3,16 @@ package if4031.client;
 import if4031.client.accessor.CassandraAccessor;
 import if4031.client.command.*;
 import if4031.client.command.cassandra.*;
+import if4031.client.model.Timeline;
+import if4031.client.model.Tweet;
+import if4031.client.model.User;
 import if4031.client.model.request.*;
+import if4031.client.model.response.DisplayTimelineResponse;
+import if4031.client.model.response.DisplayTweetResponse;
 
 import java.io.PrintStream;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class CLInterface {
@@ -77,9 +84,25 @@ public class CLInterface {
             AddTweetRequest addTweetRequest = new AddTweetRequest(addTweetCassandraCommand);
             cassandraAccessor.tweet(addTweetRequest);
         } else if (cassandraCommand instanceof DisplayTweetCassandraCommand) {
-            cassandraAccessor.displayTweet(new DisplayTweetRequest());
+            DisplayTweetResponse displayTweetResponse = cassandraAccessor.displayTweet(new DisplayTweetRequest());
+            Map<User, List<Tweet>> userListMap = displayTweetResponse.getTweetResponse();
+            for (Map.Entry<User, List<Tweet>> entry : userListMap.entrySet()) {
+                System.out.println(entry.getKey());
+                List<Tweet> tweetList = entry.getValue();
+                for (int i = 1; i <= tweetList.size(); ++i) {
+                    out.println(i+". " + tweetList.get(i-1));
+                }
+            }
         } else if (cassandraCommand instanceof DisplayTimelineCassandraCommand) {
-            cassandraAccessor.displayTimeline(new DisplayTimelineRequest());
+            DisplayTimelineResponse displayTimelineResponse = cassandraAccessor.displayTimeline(new DisplayTimelineRequest());
+            Map<User, Timeline> userListMap = displayTimelineResponse.getTimelineResponse();
+            for (Map.Entry<User, Timeline> entry : userListMap.entrySet()) {
+                System.out.println(entry.getKey());
+                List<Tweet> tweetList = entry.getValue().getTweets();
+                for (int i = 1; i <= tweetList.size(); ++i) {
+                    out.println(i+". " + tweetList.get(i-1));
+                }
+            }
         }
     }
 

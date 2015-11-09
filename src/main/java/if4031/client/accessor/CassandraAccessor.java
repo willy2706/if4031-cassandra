@@ -12,9 +12,7 @@ import if4031.client.model.response.DisplayTweetResponse;
 import if4031.client.util.TableName;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 
@@ -128,7 +126,7 @@ public class CassandraAccessor implements Accessor {
     public DisplayTweetResponse displayTweet(DisplayTweetRequest displayTweetRequest) {
         Statement statements = QueryBuilder.select().all().from(getKeyspace(), TableName.USERS);
         List<Row> userRows = getSession().execute(statements).all();
-        List<Tweet> tweetList = new ArrayList<>();
+        Map<User,List<Tweet>> userListMap = new HashMap<>();
         for (Row userRow: userRows) {
             String username = userRow.getString("username");
             User user = new User(username);
@@ -136,6 +134,7 @@ public class CassandraAccessor implements Accessor {
             Statement statement = QueryBuilder.select().all().from(getKeyspace(), TableName.TWEETS)
                     .where(eq("username", user.getUsername()));
 
+            List<Tweet> tweetList = new ArrayList<>();
             List<Row> tweetRows = getSession().execute(statement).all();
             for (Row tweetRow : tweetRows) {
                 UUID tweetuuid = tweetRow.getUUID("tweet_id");
@@ -144,8 +143,9 @@ public class CassandraAccessor implements Accessor {
                 Tweet tweet = new Tweet(whoTweet, null, tweetuuid, tweetBody);
                 tweetList.add(tweet);
             }
+            userListMap.put(user, tweetList);
         }
-        DisplayTweetResponse displayTweetResponse = new DisplayTweetResponse(tweetList);
+        DisplayTweetResponse displayTweetResponse = new DisplayTweetResponse(userListMap);
         return displayTweetResponse;
     }
 
@@ -153,6 +153,7 @@ public class CassandraAccessor implements Accessor {
         Statement statements = QueryBuilder.select().all().from(getKeyspace(), TableName.USERS);
         List<Row> userRows = getSession().execute(statements).all();
         DisplayTimelineResponse displayTimelineResponse = new DisplayTimelineResponse();
+
         for (Row userRow: userRows) {
             String username = userRow.getString("username");
             User user = new User(username);
@@ -175,7 +176,7 @@ public class CassandraAccessor implements Accessor {
             }
 
             Timeline timeline = new Timeline(tweetList);
-            displayTimelineResponse.addtweets(user, timeline);
+            displayTimelineResponse.addUserAndTweets(user, timeline);
         }
         return displayTimelineResponse;
     }
