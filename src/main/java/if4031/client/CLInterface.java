@@ -3,7 +3,7 @@ package if4031.client;
 import if4031.client.accessor.CassandraAccessor;
 import if4031.client.command.*;
 import if4031.client.command.cassandra.*;
-import if4031.client.model.*;
+import if4031.client.model.request.*;
 
 import java.io.PrintStream;
 import java.util.Scanner;
@@ -66,20 +66,20 @@ public class CLInterface {
     void processCassandra(CassandraCommand cassandraCommand) {
         if (cassandraCommand instanceof RegisterUserCassandraCommand) {
             RegisterUserCassandraCommand registerUserCassandraCommand = (RegisterUserCassandraCommand) cassandraCommand;
-            User user = new User(registerUserCassandraCommand);
-            cassandraAccessor.registerUser(user);
+            RegisterUserRequest registerUserRequest = new RegisterUserRequest(registerUserCassandraCommand);
+            cassandraAccessor.registerUser(registerUserRequest);
         } else if (cassandraCommand instanceof FollowUserCassandraCommand) {
             FollowUserCassandraCommand followUserCassandraCommand = (FollowUserCassandraCommand) cassandraCommand;
-            FollowUser followUser = new FollowUser(followUserCassandraCommand);
-            cassandraAccessor.followUser(followUser);
+            FollowUserRequest followUserRequest = new FollowUserRequest(followUserCassandraCommand);
+            cassandraAccessor.followUser(followUserRequest);
         } else if (cassandraCommand instanceof AddTweetCassandraCommand) {
             AddTweetCassandraCommand addTweetCassandraCommand = (AddTweetCassandraCommand) cassandraCommand;
-            Tweet tweet = new Tweet(addTweetCassandraCommand);
-            cassandraAccessor.tweet(tweet);
+            AddTweetRequest addTweetRequest = new AddTweetRequest(addTweetCassandraCommand);
+            cassandraAccessor.tweet(addTweetRequest);
         } else if (cassandraCommand instanceof DisplayTweetCassandraCommand) {
-            cassandraAccessor.displayTweet(new DisplayTweet());
+            cassandraAccessor.displayTweet(new DisplayTweetRequest());
         } else if (cassandraCommand instanceof DisplayTimelineCassandraCommand) {
-            cassandraAccessor.displayTimeline(new DisplayTimeline());
+            cassandraAccessor.displayTimeline(new DisplayTimelineRequest());
         }
     }
 
