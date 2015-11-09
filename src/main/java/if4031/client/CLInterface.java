@@ -87,7 +87,7 @@ public class CLInterface {
             DisplayTweetResponse displayTweetResponse = cassandraAccessor.displayTweet(new DisplayTweetRequest());
             Map<User, List<Tweet>> userListMap = displayTweetResponse.getTweetResponse();
             for (Map.Entry<User, List<Tweet>> entry : userListMap.entrySet()) {
-                System.out.println(entry.getKey());
+                System.out.println(entry.getKey().getUsername());
                 List<Tweet> tweetList = entry.getValue();
                 for (int i = 1; i <= tweetList.size(); ++i) {
                     out.println(i+". " + tweetList.get(i-1));

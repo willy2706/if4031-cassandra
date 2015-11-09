@@ -181,7 +181,7 @@ public class CommandParser {
             return new ParseResultCassandra(ParseStatus.OK, OK_TEXT, new FollowUserCassandraCommand(username, follower));
         } else if (command.equals("tweet")) {
             String username = tokens[1];
-            int firstSpaceIdx = line.indexOf(" ");
+            int firstSpaceIdx = line.indexOf(" "+username);
             String body = line.substring(firstSpaceIdx + 1);
             return new ParseResultCassandra(ParseStatus.OK, OK_TEXT, new AddTweetCassandraCommand(username, body));
         } else if (command.equals("displaytweet")) {

@@ -3,6 +3,7 @@ package if4031.client.accessor;
 import com.datastax.driver.core.*;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
+import com.datastax.driver.core.querybuilder.Select;
 import if4031.client.model.Timeline;
 import if4031.client.model.Tweet;
 import if4031.client.model.User;
@@ -90,26 +91,36 @@ public class CassandraAccessor implements Accessor {
 
     public void tweet(AddTweetRequest addTweetRequest) {
         Insert statement = QueryBuilder.insertInto(getKeyspace(), TableName.TWEETS);
-        for (Field field : addTweetRequest.getClass().getDeclaredFields()) {
-            field.setAccessible(true); // if you want to modify private fields
-            try {
-                statement.value(field.getName(), field.get(addTweetRequest));
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
+        statement.value("tweet_id", addTweetRequest.getTweet_id())
+                .value("username", addTweetRequest.getUsername())
+                .value("body", addTweetRequest.getBody());
         getSession().execute(statement);
 
-        Statement statements = QueryBuilder.select().all().from(getKeyspace(), TableName.FOLLOWERS)
+        //tambah ke userline sendiri
+        Statement statements = QueryBuilder.insertInto(getKeyspace(), TableName.USERLINE)
+                .value("username", addTweetRequest.getUsername())
+                .value("time", addTweetRequest.getTime())
+                .value("tweet_id", addTweetRequest.getTweet_id());
+        getSession().execute(statements);
+
+        //tambah ke timeline sendiri
+         statements = QueryBuilder.insertInto(getKeyspace(), TableName.TIMELINE)
+                .value("username", addTweetRequest.getUsername())
+                .value("time", addTweetRequest.getTime())
+                .value("tweet_id", addTweetRequest.getTweet_id());
+        getSession().execute(statements);
+
+        //tambah ke timeline orang lain
+        Statement selectstatements = QueryBuilder.select().all().from(getKeyspace(), TableName.FOLLOWERS).allowFiltering()
                 .where(eq("follower", addTweetRequest.getUsername()));
-        ResultSet results = getSession().execute(statements);
+        ResultSet results = getSession().execute(selectstatements);
         for (Row row : results) {
             String username = row.getString("username");
-            QueryBuilder.insertInto(getKeyspace(), TableName.TIMELINE)
-                    .value("text", username)
+            statements = QueryBuilder.insertInto(getKeyspace(), TableName.TIMELINE)
+                    .value("username", username)
                     .value("time", addTweetRequest.getTime())
                     .value("tweet_id", addTweetRequest.getTweet_id());
-            getSession().execute(statement);
+            getSession().execute(statements);
         }
     }
 
@@ -121,8 +132,7 @@ public class CassandraAccessor implements Accessor {
             String username = userRow.getString("username");
             User user = new User(username);
 
-            Statement statement = QueryBuilder.select().all().from(getKeyspace(), TableName.TWEETS)
-                    .where(eq("username", user.getUsername()));
+            Statement statement = QueryBuilder.select().all().from(getKeyspace(), TableName.TWEETS).allowFiltering().where(eq("username", user.getUsername()));
 
             List<Tweet> tweetList = new ArrayList<>();
             List<Row> tweetRows = getSession().execute(statement).all();
