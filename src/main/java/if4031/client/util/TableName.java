@@ -6,7 +6,7 @@ package if4031.client.util;
 public class TableName {
     public static String USERS = "users";
     public static String FRIENDS = "friends";
-    public static String FOLLOWER = "follower";
+    public static String FOLLOWERS = "followers";
     public static String TWEETS = "tweets";
     public static String USERLINE = "userline";
     public static String TIMELINE = "timeline";

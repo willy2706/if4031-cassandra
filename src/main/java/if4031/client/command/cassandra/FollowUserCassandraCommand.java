@@ -1,7 +1,5 @@
 package if4031.client.command.cassandra;
 
-import if4031.client.command.Command;
-
 import java.util.Date;
 
 /**
@@ -26,4 +24,7 @@ public class FollowUserCassandraCommand implements CassandraCommand {
         return follower;
     }
 
+    public Date getTimestamp() {
+        return timestamp;
+    }
 }

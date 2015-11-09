@@ -24,6 +24,7 @@ public class ClientProgram {
         cassandraAccessor.start();
         clInterface.run();
 
-        cassandraAccessor.stop(); // throws IOException
+        cassandraAccessor.stop();
+        System.exit(0);
     }
 }

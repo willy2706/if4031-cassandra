@@ -76,25 +76,15 @@ public class CassandraAccessor implements Accessor {
 
     public void followUser(FollowUserRequest followUserRequest) {
         Insert statement = QueryBuilder.insertInto(getKeyspace(), TableName.FRIENDS);
-        for (Field field : followUserRequest.getClass().getDeclaredFields()) {
-            field.setAccessible(true); // if you want to modify private fields
-            try {
-                statement.value(field.getName(), field.get(followUserRequest));
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
+        statement.value("username", followUserRequest.getUsername())
+                .value("friend",followUserRequest.getFollower())
+                .value("since", followUserRequest.getTimestamp());
         getSession().execute(statement);
 
-        statement = QueryBuilder.insertInto(getKeyspace(), TableName.FOLLOWER);
-        for (Field field : followUserRequest.getClass().getDeclaredFields()) {
-            field.setAccessible(true); // if you want to modify private fields
-            try {
-                statement.value(field.getName(), field.get(followUserRequest));
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
+        statement = QueryBuilder.insertInto(getKeyspace(), TableName.FOLLOWERS);
+        statement.value("username", followUserRequest.getUsername())
+                .value("follower",followUserRequest.getFollower())
+                .value("since", followUserRequest.getTimestamp());
         getSession().execute(statement);
     }
 
@@ -110,7 +100,7 @@ public class CassandraAccessor implements Accessor {
         }
         getSession().execute(statement);
 
-        Statement statements = QueryBuilder.select().all().from(getKeyspace(), TableName.FOLLOWER)
+        Statement statements = QueryBuilder.select().all().from(getKeyspace(), TableName.FOLLOWERS)
                 .where(eq("follower", addTweetRequest.getUsername()));
         ResultSet results = getSession().execute(statements);
         for (Row row : results) {

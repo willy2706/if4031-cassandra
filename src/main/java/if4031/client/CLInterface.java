@@ -26,12 +26,12 @@ public class CLInterface {
         scanner = _scanner;
         out = _out;
         cassandraAccessor = _cassandraAccessor;
-        MENU[0] = "1. mendaftar user baru\n";
-        MENU[1] = "2. follow a friend\n";
-        MENU[2] = "3. menambah tweet\n";
-        MENU[3] = "4. menampilkan tweet per user\n";
-        MENU[4] = "5. menampilkan timeline per user\n";
-        MENU[5] = "6. exit\n>>";
+        MENU[0] = "1. mendaftar user baru (register <username> <password>)\n";
+        MENU[1] = "2. follow a friend (follow <username> <follower>)\n";
+        MENU[2] = "3. menambah tweet (tweet <username> <body>)\n";
+        MENU[3] = "4. menampilkan tweet per user (displaytweet)\n";
+        MENU[4] = "5. menampilkan timeline per user (displaytimeline) \n";
+        MENU[5] = "6. exit (exit)\n>>";
         for (int i = 0; i < 6; ++i) {
             COMMAND_PROMPT+=MENU[i];
         }
