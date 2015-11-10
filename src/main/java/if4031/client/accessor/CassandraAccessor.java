@@ -165,7 +165,7 @@ public class CassandraAccessor implements Accessor {
             List<Tweet> tweetList = new ArrayList<>();
             for (Row timelineRow : timelineRows) {
                 UUID tweetuuid = timelineRow.getUUID("tweet_id");
-                UUID timeuuid = timelineRow.getUUID("timeuuid");
+                UUID timeuuid = timelineRow.getUUID("time");
                 Statement tweetStatement = QueryBuilder.select().all().from(getKeyspace(), TableName.TWEETS)
                         .where(eq("tweet_id", tweetuuid));
                 Row tweetRow = getSession().execute(tweetStatement).one();

@@ -90,17 +90,17 @@ public class CLInterface {
                 System.out.println(entry.getKey().getUsername());
                 List<Tweet> tweetList = entry.getValue();
                 for (int i = 1; i <= tweetList.size(); ++i) {
-                    out.println(i+". " + tweetList.get(i-1));
+                    out.println(i+". " + tweetList.get(i-1).getBody());
                 }
             }
         } else if (cassandraCommand instanceof DisplayTimelineCassandraCommand) {
             DisplayTimelineResponse displayTimelineResponse = cassandraAccessor.displayTimeline(new DisplayTimelineRequest());
             Map<User, Timeline> userListMap = displayTimelineResponse.getTimelineResponse();
             for (Map.Entry<User, Timeline> entry : userListMap.entrySet()) {
-                System.out.println(entry.getKey());
+                System.out.println(entry.getKey().getUsername());
                 List<Tweet> tweetList = entry.getValue().getTweets();
                 for (int i = 1; i <= tweetList.size(); ++i) {
-                    out.println(i+". " + tweetList.get(i-1));
+                    out.println(i+". [" + tweetList.get(i-1).getTime() +"] ["+ tweetList.get(i-1).getUsername() +"] " +tweetList.get(i-1).getBody());
                 }
             }
         }
